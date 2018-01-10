@@ -78,7 +78,7 @@ public class CallBackHandler {
             final Date timestamp = event.getTimestamp();
 
             logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
-                messageId, messageText, senderId, timestamp);
+                    messageId, messageText, senderId, timestamp);
 
             sendTextMessage(senderId, "Hello, this is a random reply...");
             sendTextMessage(senderId, "almost :)");
@@ -99,9 +99,5 @@ public class CallBackHandler {
 
     private void handleSendException(Exception e) {
         logger.error("Message could not be sent. An unexpected error occurred.", e);
-    }
-
-    private void handleIOException(Exception e) {
-        logger.error("Could not open Spring.io page. An unexpected error occurred.", e);
     }
 }
