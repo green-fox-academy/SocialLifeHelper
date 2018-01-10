@@ -125,7 +125,7 @@ public class CallBackHandler {
                 switch (messageText.toLowerCase()) {
 
 
-                    case "yo":
+                    case "szia":
                         sendTextMessage(senderId, "Hello, What I can do for you ? Type the word you're looking for");
                         break;
 
