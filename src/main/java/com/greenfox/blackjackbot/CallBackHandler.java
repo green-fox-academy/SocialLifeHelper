@@ -56,7 +56,6 @@ public class CallBackHandler {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> handleCallback(@RequestBody final String payload,
                                                @RequestHeader("X-Hub-Signature") final String signature) {
-
         logger.debug("Received Messenger Platform callback - payload: {} | signature: {}", payload, signature);
         try {
             this.receiveClient.processCallbackPayload(payload, signature);
@@ -99,9 +98,5 @@ public class CallBackHandler {
 
     private void handleSendException(Exception e) {
         logger.error("Message could not be sent. An unexpected error occurred.", e);
-    }
-
-    private void handleIOException(Exception e) {
-        logger.error("Could not open Spring.io page. An unexpected error occurred.", e);
     }
 }
