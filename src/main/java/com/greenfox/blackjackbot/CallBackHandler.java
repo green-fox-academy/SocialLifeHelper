@@ -121,7 +121,8 @@ public class CallBackHandler {
             logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
                 messageId, messageText, senderId, timestamp);
 
-            sendTextMessage(senderId, "Hello, this is a standard reply");
+            sendTextMessage(senderId, "Hello, this is a random reply...");
+            sendTextMessage(senderId, "almost :)");
         };
     }
 
