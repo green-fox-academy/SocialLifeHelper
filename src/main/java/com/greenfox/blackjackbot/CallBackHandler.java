@@ -58,14 +58,14 @@ public class CallBackHandler {
         logger.debug("Initializing MessengerReceiveClient - appSecret: {} | verifyToken: {}", appSecret, verifyToken);
         this.receiveClient = MessengerPlatform.newReceiveClientBuilder(appSecret, verifyToken)
                 .onTextMessageEvent(newTextMessageEventHandler())
-                .onQuickReplyMessageEvent(newQuickReplyMessageEventHandler())
-                .onPostbackEvent(newPostbackEventHandler())
-                .onAccountLinkingEvent(newAccountLinkingEventHandler())
-                .onOptInEvent(newOptInEventHandler())
-                .onEchoMessageEvent(newEchoMessageEventHandler())
-                .onMessageDeliveredEvent(newMessageDeliveredEventHandler())
-                .onMessageReadEvent(newMessageReadEventHandler())
-                .fallbackEventHandler(newFallbackEventHandler())
+//                .onQuickReplyMessageEvent(newQuickReplyMessageEventHandler())
+//                .onPostbackEvent(newPostbackEventHandler())
+//                .onAccountLinkingEvent(newAccountLinkingEventHandler())
+//                .onOptInEvent(newOptInEventHandler())
+//                .onEchoMessageEvent(newEchoMessageEventHandler())
+//                .onMessageDeliveredEvent(newMessageDeliveredEventHandler())
+//                .onMessageReadEvent(newMessageReadEventHandler())
+//                .fallbackEventHandler(newFallbackEventHandler())
                 .build();
         this.sendClient = sendClient;
     }
@@ -119,247 +119,252 @@ public class CallBackHandler {
             final Date timestamp = event.getTimestamp();
 
             logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
-                    messageId, messageText, senderId, timestamp);
+                messageId, messageText, senderId, timestamp);
 
-            try {
-                switch (messageText.toLowerCase()) {
-
-
-                    case "szia":
-                        sendTextMessage(senderId, "Hello, What I can do for you ? Type the word you're looking for");
-                        break;
-
-                    case "great":
-                        sendTextMessage(senderId, "You're welcome :) keep rocking");
-                        break;
-
-
-                    default:
-                        sendReadReceipt(senderId);
-                        sendTypingOn(senderId);
-                        sendSpringDoc(senderId, messageText);
-                        sendQuickReply(senderId);
-                        sendTypingOff(senderId);
-                }
-            } catch (MessengerApiException | MessengerIOException e) {
-                handleSendException(e);
-            } catch (IOException e) {
-                handleIOException(e);
-            }
+            sendTextMessage(senderId, "Hello, this is a standard reply");
         };
     }
 
-    private void sendSpringDoc(String recipientId, String keyword) throws MessengerApiException, MessengerIOException, IOException {
 
-        Document doc = Jsoup.connect(("https://spring.io/search?q=").concat(keyword)).get();
-        String countResult = doc.select("div.search-results--count").first().ownText();
-        Elements searchResult = doc.select("section.search-result");
-        List<SearchResult> searchResults = searchResult.stream().map(element ->
-                new SearchResult(element.select("a").first().ownText(),
-                        element.select("a").first().absUrl("href"),
-                        element.select("div.search-result--subtitle").first().ownText(),
-                        element.select("div.search-result--summary").first().ownText())
-        ).limit(3).collect(Collectors.toList());
-
-        final List<Button> firstLink = Button.newListBuilder()
-                .addUrlButton("Open Link", searchResults.get(0).getLink()).toList()
-                .build();
-        final List<Button> secondLink = Button.newListBuilder()
-                .addUrlButton("Open Link", searchResults.get(1).getLink()).toList()
-                .build();
-        final List<Button> thirdtLink = Button.newListBuilder()
-                .addUrlButton("Open Link", searchResults.get(2).getLink()).toList()
-                .build();
-        final List<Button> searchLink = Button.newListBuilder()
-                .addUrlButton("Open Link", ("https://spring.io/search?q=").concat(keyword)).toList()
-                .build();
-
-
-        final GenericTemplate genericTemplate = GenericTemplate.newBuilder()
-                .addElements()
-                .addElement(searchResults.get(0).getTitle())
-                .subtitle(searchResults.get(0).getSubtitle())
-                .itemUrl(searchResults.get(0).getLink())
-                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-                .buttons(firstLink)
-                .toList()
-                .addElement(searchResults.get(1).getTitle())
-                .subtitle(searchResults.get(1).getSubtitle())
-                .itemUrl(searchResults.get(1).getLink())
-                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-                .buttons(secondLink)
-                .toList()
-                .addElement(searchResults.get(2).getTitle())
-                .subtitle(searchResults.get(2).getSubtitle())
-                .itemUrl(searchResults.get(2).getLink())
-                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-                .buttons(thirdtLink)
-                .toList()
-                .addElement("All results " + countResult)
-                .subtitle("Spring Search Result")
-                .itemUrl(("https://spring.io/search?q=").concat(keyword))
-                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-                .buttons(searchLink)
-                .toList()
-                .done()
-                .build();
-
-        this.sendClient.sendTemplate(recipientId, genericTemplate);
-    }
-
-    private void sendGifMessage(String recipientId, String gif) throws MessengerApiException, MessengerIOException {
-        this.sendClient.sendImageAttachment(recipientId, gif);
-    }
-
-
-    private void sendQuickReply(String recipientId) throws MessengerApiException, MessengerIOException {
-        final List<QuickReply> quickReplies = QuickReply.newListBuilder()
-                .addTextQuickReply("Looks good", GOOD_ACTION).toList()
-                .addTextQuickReply("Nope!", NOT_GOOD_ACTION).toList()
-                .build();
-
-        this.sendClient.sendTextMessage(recipientId, "Was this helpful?!", quickReplies);
-    }
-
-    private void sendReadReceipt(String recipientId) throws MessengerApiException, MessengerIOException {
-        this.sendClient.sendSenderAction(recipientId, SenderAction.MARK_SEEN);
-    }
-
-    private void sendTypingOn(String recipientId) throws MessengerApiException, MessengerIOException {
-        this.sendClient.sendSenderAction(recipientId, SenderAction.TYPING_ON);
-    }
-
-    private void sendTypingOff(String recipientId) throws MessengerApiException, MessengerIOException {
-        this.sendClient.sendSenderAction(recipientId, SenderAction.TYPING_OFF);
-    }
-
-    private QuickReplyMessageEventHandler newQuickReplyMessageEventHandler() {
-        return event -> {
-            logger.debug("Received QuickReplyMessageEvent: {}", event);
-
-            final String senderId = event.getSender().getId();
-            final String messageId = event.getMid();
-            final String quickReplyPayload = event.getQuickReply().getPayload();
-
-            logger.info("Received quick reply for message '{}' with payload '{}'", messageId, quickReplyPayload);
-
-
-            try {
-                if (quickReplyPayload.equals(GOOD_ACTION))
-                    sendGifMessage(senderId, "https://media.giphy.com/media/3oz8xPxTUeebQ8pL1e/giphy.gif");
-                else
-                    sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
-            } catch (MessengerApiException e) {
-                handleSendException(e);
-            } catch (MessengerIOException e) {
-                handleIOException(e);
-            }
-
-            sendTextMessage(senderId, "Let's try another one :D!");
-        };
-    }
-
-    private PostbackEventHandler newPostbackEventHandler() {
-        return event -> {
-            logger.debug("Received PostbackEvent: {}", event);
-
-            final String senderId = event.getSender().getId();
-            final String recipientId = event.getRecipient().getId();
-            final String payload = event.getPayload();
-            final Date timestamp = event.getTimestamp();
-
-            logger.info("Received postback for user '{}' and page '{}' with payload '{}' at '{}'",
-                    senderId, recipientId, payload, timestamp);
-
-            sendTextMessage(senderId, "Postback called");
-        };
-    }
-
-    private AccountLinkingEventHandler newAccountLinkingEventHandler() {
-        return event -> {
-            logger.debug("Received AccountLinkingEvent: {}", event);
-
-            final String senderId = event.getSender().getId();
-            final AccountLinkingEvent.AccountLinkingStatus accountLinkingStatus = event.getStatus();
-            final String authorizationCode = event.getAuthorizationCode();
-
-            logger.info("Received account linking event for user '{}' with status '{}' and auth code '{}'",
-                    senderId, accountLinkingStatus, authorizationCode);
-        };
-    }
-
-    private OptInEventHandler newOptInEventHandler() {
-        return event -> {
-            logger.debug("Received OptInEvent: {}", event);
-
-            final String senderId = event.getSender().getId();
-            final String recipientId = event.getRecipient().getId();
-            final String passThroughParam = event.getRef();
-            final Date timestamp = event.getTimestamp();
-
-            logger.info("Received authentication for user '{}' and page '{}' with pass through param '{}' at '{}'",
-                    senderId, recipientId, passThroughParam, timestamp);
-
-            sendTextMessage(senderId, "Authentication successful");
-        };
-    }
-
-    private EchoMessageEventHandler newEchoMessageEventHandler() {
-        return event -> {
-            logger.debug("Received EchoMessageEvent: {}", event);
-
-            final String messageId = event.getMid();
-            final String recipientId = event.getRecipient().getId();
-            final String senderId = event.getSender().getId();
-            final Date timestamp = event.getTimestamp();
-
-            logger.info("Received echo for message '{}' that has been sent to recipient '{}' by sender '{}' at '{}'",
-                    messageId, recipientId, senderId, timestamp);
-        };
-    }
-
-    private MessageDeliveredEventHandler newMessageDeliveredEventHandler() {
-        return event -> {
-            logger.debug("Received MessageDeliveredEvent: {}", event);
-
-            final List<String> messageIds = event.getMids();
-            final Date watermark = event.getWatermark();
-            final String senderId = event.getSender().getId();
-
-            if (messageIds != null) {
-                messageIds.forEach(messageId -> {
-                    logger.info("Received delivery confirmation for message '{}'", messageId);
-                });
-            }
-
-            logger.info("All messages before '{}' were delivered to user '{}'", watermark, senderId);
-        };
-    }
-
-    private MessageReadEventHandler newMessageReadEventHandler() {
-        return event -> {
-            logger.debug("Received MessageReadEvent: {}", event);
-
-            final Date watermark = event.getWatermark();
-            final String senderId = event.getSender().getId();
-
-            logger.info("All messages before '{}' were read by user '{}'", watermark, senderId);
-        };
-    }
-
-    /**
-     * This handler is called when either the message is unsupported or when the event handler for the actual event type
-     * is not registered. In this showcase all event handlers are registered. Hence only in case of an
-     * unsupported message the fallback event handler is called.
-     */
-    private FallbackEventHandler newFallbackEventHandler() {
-        return event -> {
-            logger.debug("Received FallbackEvent: {}", event);
-
-            final String senderId = event.getSender().getId();
-            logger.info("Received unsupported message from user '{}'", senderId);
-        };
-    }
+//            try {
+//                switch (messageText.toLowerCase()) {
+//
+//
+//                    case "szia":
+//                        sendTextMessage(senderId, "Hello, What I can do for you ? Type the word you're looking for");
+//                        break;
+//
+//                    case "great":
+//                        sendTextMessage(senderId, "You're welcome :) keep rocking");
+//                        break;
+//
+//
+//                    default:
+//                        sendReadReceipt(senderId);
+//                        sendTypingOn(senderId);
+//                        sendSpringDoc(senderId, messageText);
+//                        sendQuickReply(senderId);
+//                        sendTypingOff(senderId);
+//                }
+//            } catch (MessengerApiException | MessengerIOException e) {
+//                handleSendException(e);
+//            } catch (IOException e) {
+//                handleIOException(e);
+//            }
+//        };
+//    }
+//
+//    private void sendSpringDoc(String recipientId, String keyword) throws MessengerApiException, MessengerIOException, IOException {
+//
+//        Document doc = Jsoup.connect(("https://spring.io/search?q=").concat(keyword)).get();
+//        String countResult = doc.select("div.search-results--count").first().ownText();
+//        Elements searchResult = doc.select("section.search-result");
+//        List<SearchResult> searchResults = searchResult.stream().map(element ->
+//                new SearchResult(element.select("a").first().ownText(),
+//                        element.select("a").first().absUrl("href"),
+//                        element.select("div.search-result--subtitle").first().ownText(),
+//                        element.select("div.search-result--summary").first().ownText())
+//        ).limit(3).collect(Collectors.toList());
+//
+//        final List<Button> firstLink = Button.newListBuilder()
+//                .addUrlButton("Open Link", searchResults.get(0).getLink()).toList()
+//                .build();
+//        final List<Button> secondLink = Button.newListBuilder()
+//                .addUrlButton("Open Link", searchResults.get(1).getLink()).toList()
+//                .build();
+//        final List<Button> thirdtLink = Button.newListBuilder()
+//                .addUrlButton("Open Link", searchResults.get(2).getLink()).toList()
+//                .build();
+//        final List<Button> searchLink = Button.newListBuilder()
+//                .addUrlButton("Open Link", ("https://spring.io/search?q=").concat(keyword)).toList()
+//                .build();
+//
+//
+//        final GenericTemplate genericTemplate = GenericTemplate.newBuilder()
+//                .addElements()
+//                .addElement(searchResults.get(0).getTitle())
+//                .subtitle(searchResults.get(0).getSubtitle())
+//                .itemUrl(searchResults.get(0).getLink())
+//                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
+//                .buttons(firstLink)
+//                .toList()
+//                .addElement(searchResults.get(1).getTitle())
+//                .subtitle(searchResults.get(1).getSubtitle())
+//                .itemUrl(searchResults.get(1).getLink())
+//                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
+//                .buttons(secondLink)
+//                .toList()
+//                .addElement(searchResults.get(2).getTitle())
+//                .subtitle(searchResults.get(2).getSubtitle())
+//                .itemUrl(searchResults.get(2).getLink())
+//                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
+//                .buttons(thirdtLink)
+//                .toList()
+//                .addElement("All results " + countResult)
+//                .subtitle("Spring Search Result")
+//                .itemUrl(("https://spring.io/search?q=").concat(keyword))
+//                .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
+//                .buttons(searchLink)
+//                .toList()
+//                .done()
+//                .build();
+//
+//        this.sendClient.sendTemplate(recipientId, genericTemplate);
+//    }
+//
+//    private void sendGifMessage(String recipientId, String gif) throws MessengerApiException, MessengerIOException {
+//        this.sendClient.sendImageAttachment(recipientId, gif);
+//    }
+//
+//
+//    private void sendQuickReply(String recipientId) throws MessengerApiException, MessengerIOException {
+//        final List<QuickReply> quickReplies = QuickReply.newListBuilder()
+//                .addTextQuickReply("Looks good", GOOD_ACTION).toList()
+//                .addTextQuickReply("Nope!", NOT_GOOD_ACTION).toList()
+//                .build();
+//
+//        this.sendClient.sendTextMessage(recipientId, "Was this helpful?!", quickReplies);
+//    }
+//
+//    private void sendReadReceipt(String recipientId) throws MessengerApiException, MessengerIOException {
+//        this.sendClient.sendSenderAction(recipientId, SenderAction.MARK_SEEN);
+//    }
+//
+//    private void sendTypingOn(String recipientId) throws MessengerApiException, MessengerIOException {
+//        this.sendClient.sendSenderAction(recipientId, SenderAction.TYPING_ON);
+//    }
+//
+//    private void sendTypingOff(String recipientId) throws MessengerApiException, MessengerIOException {
+//        this.sendClient.sendSenderAction(recipientId, SenderAction.TYPING_OFF);
+//    }
+//
+//    private QuickReplyMessageEventHandler newQuickReplyMessageEventHandler() {
+//        return event -> {
+//            logger.debug("Received QuickReplyMessageEvent: {}", event);
+//
+//            final String senderId = event.getSender().getId();
+//            final String messageId = event.getMid();
+//            final String quickReplyPayload = event.getQuickReply().getPayload();
+//
+//            logger.info("Received quick reply for message '{}' with payload '{}'", messageId, quickReplyPayload);
+//
+//
+//            try {
+//                if (quickReplyPayload.equals(GOOD_ACTION))
+//                    sendGifMessage(senderId, "https://media.giphy.com/media/3oz8xPxTUeebQ8pL1e/giphy.gif");
+//                else
+//                    sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
+//            } catch (MessengerApiException e) {
+//                handleSendException(e);
+//            } catch (MessengerIOException e) {
+//                handleIOException(e);
+//            }
+//
+//            sendTextMessage(senderId, "Let's try another one :D!");
+//        };
+//    }
+//
+//    private PostbackEventHandler newPostbackEventHandler() {
+//        return event -> {
+//            logger.debug("Received PostbackEvent: {}", event);
+//
+//            final String senderId = event.getSender().getId();
+//            final String recipientId = event.getRecipient().getId();
+//            final String payload = event.getPayload();
+//            final Date timestamp = event.getTimestamp();
+//
+//            logger.info("Received postback for user '{}' and page '{}' with payload '{}' at '{}'",
+//                    senderId, recipientId, payload, timestamp);
+//
+//            sendTextMessage(senderId, "Postback called");
+//        };
+//    }
+//
+//    private AccountLinkingEventHandler newAccountLinkingEventHandler() {
+//        return event -> {
+//            logger.debug("Received AccountLinkingEvent: {}", event);
+//
+//            final String senderId = event.getSender().getId();
+//            final AccountLinkingEvent.AccountLinkingStatus accountLinkingStatus = event.getStatus();
+//            final String authorizationCode = event.getAuthorizationCode();
+//
+//            logger.info("Received account linking event for user '{}' with status '{}' and auth code '{}'",
+//                    senderId, accountLinkingStatus, authorizationCode);
+//        };
+//    }
+//
+//    private OptInEventHandler newOptInEventHandler() {
+//        return event -> {
+//            logger.debug("Received OptInEvent: {}", event);
+//
+//            final String senderId = event.getSender().getId();
+//            final String recipientId = event.getRecipient().getId();
+//            final String passThroughParam = event.getRef();
+//            final Date timestamp = event.getTimestamp();
+//
+//            logger.info("Received authentication for user '{}' and page '{}' with pass through param '{}' at '{}'",
+//                    senderId, recipientId, passThroughParam, timestamp);
+//
+//            sendTextMessage(senderId, "Authentication successful");
+//        };
+//    }
+//
+//    private EchoMessageEventHandler newEchoMessageEventHandler() {
+//        return event -> {
+//            logger.debug("Received EchoMessageEvent: {}", event);
+//
+//            final String messageId = event.getMid();
+//            final String recipientId = event.getRecipient().getId();
+//            final String senderId = event.getSender().getId();
+//            final Date timestamp = event.getTimestamp();
+//
+//            logger.info("Received echo for message '{}' that has been sent to recipient '{}' by sender '{}' at '{}'",
+//                    messageId, recipientId, senderId, timestamp);
+//        };
+//    }
+//
+//    private MessageDeliveredEventHandler newMessageDeliveredEventHandler() {
+//        return event -> {
+//            logger.debug("Received MessageDeliveredEvent: {}", event);
+//
+//            final List<String> messageIds = event.getMids();
+//            final Date watermark = event.getWatermark();
+//            final String senderId = event.getSender().getId();
+//
+//            if (messageIds != null) {
+//                messageIds.forEach(messageId -> {
+//                    logger.info("Received delivery confirmation for message '{}'", messageId);
+//                });
+//            }
+//
+//            logger.info("All messages before '{}' were delivered to user '{}'", watermark, senderId);
+//        };
+//    }
+//
+//    private MessageReadEventHandler newMessageReadEventHandler() {
+//        return event -> {
+//            logger.debug("Received MessageReadEvent: {}", event);
+//
+//            final Date watermark = event.getWatermark();
+//            final String senderId = event.getSender().getId();
+//
+//            logger.info("All messages before '{}' were read by user '{}'", watermark, senderId);
+//        };
+//    }
+//
+//    /**
+//     * This handler is called when either the message is unsupported or when the event handler for the actual event type
+//     * is not registered. In this showcase all event handlers are registered. Hence only in case of an
+//     * unsupported message the fallback event handler is called.
+//     */
+//    private FallbackEventHandler newFallbackEventHandler() {
+//        return event -> {
+//            logger.debug("Received FallbackEvent: {}", event);
+//
+//            final String senderId = event.getSender().getId();
+//            logger.info("Received unsupported message from user '{}'", senderId);
+//        };
+//    }
 
     private void sendTextMessage(String recipientId, String text) {
         try {
