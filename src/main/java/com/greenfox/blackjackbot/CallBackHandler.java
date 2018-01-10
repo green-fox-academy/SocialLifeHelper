@@ -137,7 +137,7 @@ public class CallBackHandler {
                     default:
                         sendReadReceipt(senderId);
                         sendTypingOn(senderId);
-                        sendSpringDoc(senderId, messageText);
+                        sendSpringDoc(senderId, "mvc");
                         sendQuickReply(senderId);
                         sendTypingOff(senderId);
                 }
