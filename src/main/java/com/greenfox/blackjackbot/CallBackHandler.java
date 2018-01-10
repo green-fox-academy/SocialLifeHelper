@@ -81,7 +81,7 @@ public class CallBackHandler {
                     messageId, messageText, senderId, timestamp);
 
             sendTextMessage(senderId, "Hello, this is a random reply...");
-            sendTextMessage(senderId, "almost :)");
+            // sendTextMessage(senderId, "almost :)");
         };
     }
 
