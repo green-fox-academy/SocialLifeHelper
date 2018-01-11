@@ -7,7 +7,7 @@ public class Dealer {
     ArrayList<Card> hand;
     private int handvalue = 0;
     private Card[] aHand;
-    private int AceCounter;
+    private static int AceCounter;
 
     public Dealer(Deck deck) {
         hand = new ArrayList<>();
@@ -41,6 +41,10 @@ public class Dealer {
         hand.add(deck.drawCard());
         aHand = hand.toArray(aHand);
         handvalue = 0;
+        getHandvalue(aHand,handvalue );
+    }
+
+    public static int getHandvalue(Card[] aHand, int handvalue) {
         for (int i = 0; i < aHand.length; i++) {
             handvalue += aHand[i].getValue();
             if (aHand[i].getValue() == 11) {
@@ -51,6 +55,7 @@ public class Dealer {
                 AceCounter--;
             }
         }
+        return handvalue;
     }
 
      // Determines if the dealer wants to hit according to classic Blackjack rules.

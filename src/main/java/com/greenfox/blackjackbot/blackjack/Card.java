@@ -5,7 +5,7 @@ public class Card {
     private int rank;
     private int suit;
     private int value;
-    private static String[] ranks = {"Joker", "Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"};
+    private static String[] ranks = {"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"};
     private static String[] suits = {"Clubs", "Diamonds", "Hearts", "Spades"};
 
 
