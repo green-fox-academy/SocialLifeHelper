@@ -187,14 +187,18 @@ public class CallBackHandler {
           sendGifMessage(senderId,
               giphyData.getData().getImageOriginalUrl());
         } else if (quickReplyPayload.equals(NOT_GOOD_ACTION)) {
-          sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
+          SearchRandom giphyData = giphy.searchRandom("sad");
+          sendGifMessage(senderId,
+              giphyData.getData().getImageOriginalUrl());
         } else if (quickReplyPayload.equals(PLAY)) {
           SearchRandom giphyData = giphy.searchRandom("cool");
           sendGifMessage(senderId,
               giphyData.getData().getImageOriginalUrl());
         } else {
-          sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
-          sendTextMessage(senderId,"Go out and play then, you moron." );
+          SearchRandom giphyData = giphy.searchRandom("loser");
+          sendGifMessage(senderId,
+              giphyData.getData().getImageOriginalUrl());
+          sendTextMessage(senderId, "Go out and play then, you moron.");
         }
       } catch (MessengerApiException e) {
         handleSendException(e);
