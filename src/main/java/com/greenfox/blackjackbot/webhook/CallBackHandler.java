@@ -1,5 +1,8 @@
 package com.greenfox.blackjackbot.webhook;
 
+import at.mukprojects.giphy4j.Giphy;
+import at.mukprojects.giphy4j.entity.search.SearchRandom;
+import at.mukprojects.giphy4j.exception.GiphyException;
 import com.github.messenger4j.MessengerPlatform;
 import com.github.messenger4j.exceptions.MessengerApiException;
 import com.github.messenger4j.exceptions.MessengerIOException;
@@ -167,6 +170,7 @@ public class CallBackHandler {
   }
 
   private QuickReplyMessageEventHandler newQuickReplyMessageEventHandler() {
+    Giphy giphy = new Giphy("P5Zwp1RjW4BcEyjPcviLBigECnkKM2Pb");
     return event -> {
       logger.debug("Received QuickReplyMessageEvent: {}", event);
 
@@ -179,12 +183,15 @@ public class CallBackHandler {
 
       try {
         if (quickReplyPayload.equals(GOOD_ACTION)) {
+          SearchRandom giphyData = giphy.searchRandom("okay");
           sendGifMessage(senderId,
-              "https://media.giphy.com/media/3oz8xPxTUeebQ8pL1e/giphy.gif");
+              giphyData.getData().getImageOriginalUrl());
         } else if (quickReplyPayload.equals(NOT_GOOD_ACTION)) {
           sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
         } else if (quickReplyPayload.equals(PLAY)) {
-          sendGifMessage(senderId, "https://media.giphy.com/media/YfMHLC2s6okBq/giphy.gif");
+          SearchRandom giphyData = giphy.searchRandom("cool");
+          sendGifMessage(senderId,
+              giphyData.getData().getImageOriginalUrl());
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId,"Go out and play then, you moron." );
@@ -193,6 +200,8 @@ public class CallBackHandler {
         handleSendException(e);
       } catch (MessengerIOException e) {
         handleIOException(e);
+      } catch (GiphyException e) {
+        e.printStackTrace();
       }
     };
   }
