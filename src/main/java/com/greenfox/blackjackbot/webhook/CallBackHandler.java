@@ -179,8 +179,9 @@ public class CallBackHandler {
       try {
         if (quickReplyPayload.equals(PLAY)) {
           SearchRandom giphyData = giphy.searchRandom("cool");
+
           sendGifMessage(senderId,
-              "https://media.giphy.com/media/rrFcUcN3MFmta/giphy.gif");
+              giphyData.getData().getImageOriginalUrl());
           sendQuickReply(senderId);
         } else if (quickReplyPayload.equals(XKCD)) {
           sendTextMessage(senderId, "https://xkcd.com/" + generateRandom());
@@ -194,10 +195,8 @@ public class CallBackHandler {
         } else if (quickReplyPayload.equals(USELESS)) {
           sendTextMessage(senderId, "http://www.theuselessweb.com/");
         } else if (quickReplyPayload.equals(PLAYDICE)) {
-
           int user = generateRandomForDice();
           int bot = generateRandomForDice();
-
           if (user > bot) {
             sendTextMessage(senderId,
                 "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String
