@@ -196,7 +196,10 @@ public class CallBackHandler {
         } else if (quickReplyPayload.equals(JUSTAGIF)) {
           SearchFeed feed = giphy.trend();
           sendGifMessage(senderId, feed.getDataList().get(0).getImages().getOriginal().getUrl());
-        } else if (quickReplyPayload.equals(USELESS)) {
+        } else if (quickReplyPayload.equals(WEIRD)) {
+          sendTextMessage(senderId, "http://weirdorconfusing.com/" );
+        }
+        else if (quickReplyPayload.equals(USELESS)) {
           sendTextMessage(senderId, "http://www.theuselessweb.com/");
         }
         else {
