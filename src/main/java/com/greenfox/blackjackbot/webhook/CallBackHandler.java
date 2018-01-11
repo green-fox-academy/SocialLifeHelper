@@ -35,6 +35,8 @@ public class CallBackHandler {
 
   public static final String GOOD_ACTION = "DEVELOPER_DEFINED_PAYLOAD_FOR_GOOD_ACTION";
   public static final String NOT_GOOD_ACTION = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOT_GOOD_ACTION";
+  public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
+  public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
 
   private final MessengerReceiveClient receiveClient;
   private final MessengerSendClient sendClient;
@@ -108,8 +110,6 @@ public class CallBackHandler {
       try {
         String lower = messageText.toLowerCase();
         if (lower.length() > 0) {
-          sendTextMessage(senderId,
-              "Hello, do you want to play");
           sendQuickYesNoReply(senderId);
         } else {
           sendReadReceipt(senderId);
@@ -174,11 +174,11 @@ public class CallBackHandler {
   private void sendQuickYesNoReply(String recipientId)
       throws MessengerApiException, MessengerIOException {
     final List<QuickReply> quickReplies = QuickReply.newListBuilder()
-        .addTextQuickReply("Yes", GOOD_ACTION).toList()
-        .addTextQuickReply("No", NOT_GOOD_ACTION).toList()
+        .addTextQuickReply("Yes", PLAY).toList()
+        .addTextQuickReply("No", NOPLAY).toList()
         .build();
 
-    this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
+    this.sendClient.sendTextMessage(recipientId, "Do you want to play?", quickReplies);
   }
 
   private void sendReadReceipt(String recipientId)
@@ -210,8 +210,12 @@ public class CallBackHandler {
         if (quickReplyPayload.equals(GOOD_ACTION)) {
           sendGifMessage(senderId,
               "https://media.giphy.com/media/3oz8xPxTUeebQ8pL1e/giphy.gif");
-        } else {
+        } else if (quickReplyPayload.equals(NOT_GOOD_ACTION)){
           sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
+        } else if (quickReplyPayload.equals(PLAY)) {
+          sendGifMessage(senderId, "https://media.giphy.com/media/YfMHLC2s6okBq/giphy.gif");
+        } else {
+          sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
         }
       } catch (MessengerApiException e) {
         handleSendException(e);
