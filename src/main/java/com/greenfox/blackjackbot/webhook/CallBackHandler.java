@@ -110,56 +110,27 @@ public class CallBackHandler {
       try {
         String lower = messageText.toLowerCase();
         if (lower.length() > 0) {
+          sendReadReceipt(senderId);
+          sendTypingOn(senderId);
           sendQuickYesNoReply(senderId);
+          sendTypingOff(senderId);
         } else {
           sendReadReceipt(senderId);
           sendTypingOn(senderId);
-          sendSpringDoc(senderId, messageText);
           sendQuickReply(senderId);
           sendTypingOff(senderId);
         }
       } catch (MessengerApiException | MessengerIOException e) {
         handleSendException(e);
-      } catch (IOException e) {
-        handleIOException(e);
       }
     };
   }
 
-  private void sendSpringDoc(String recipientId, String keyword)
-      throws MessengerApiException, MessengerIOException, IOException {
-
-    Document doc = Jsoup.connect(("https://spring.io/search?q=").concat(keyword)).get();
-    String countResult = doc.select("div.search-results--count").first().ownText();
-    Elements searchResult = doc.select("section.search-result");
-    List<SearchResult> searchResults = searchResult.stream().map(element ->
-        new SearchResult(element.select("a").first().ownText(),
-            element.select("a").first().absUrl("href"),
-            element.select("div.search-result--subtitle").first().ownText(),
-            element.select("div.search-result--summary").first().ownText())
-    ).limit(3).collect(Collectors.toList());
-
-    final List<Button> firstLink = Button.newListBuilder()
-        .addUrlButton("Open Link", searchResults.get(0).getLink()).toList()
-        .build();
-
-    final GenericTemplate genericTemplate = GenericTemplate.newBuilder()
-        .addElements()
-        .addElement(searchResults.get(0).getTitle())
-        .subtitle(searchResults.get(0).getSubtitle())
-        .itemUrl(searchResults.get(0).getLink())
-        .buttons(firstLink)
-        .toList()
-        .done()
-        .build();
-    this.sendClient.sendTemplate(recipientId, genericTemplate);
-  }
 
   private void sendGifMessage(String recipientId, String gif)
       throws MessengerApiException, MessengerIOException {
     this.sendClient.sendImageAttachment(recipientId, gif);
   }
-
 
   private void sendQuickReply(String recipientId)
       throws MessengerApiException, MessengerIOException {
@@ -210,20 +181,19 @@ public class CallBackHandler {
         if (quickReplyPayload.equals(GOOD_ACTION)) {
           sendGifMessage(senderId,
               "https://media.giphy.com/media/3oz8xPxTUeebQ8pL1e/giphy.gif");
-        } else if (quickReplyPayload.equals(NOT_GOOD_ACTION)){
+        } else if (quickReplyPayload.equals(NOT_GOOD_ACTION)) {
           sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
         } else if (quickReplyPayload.equals(PLAY)) {
           sendGifMessage(senderId, "https://media.giphy.com/media/YfMHLC2s6okBq/giphy.gif");
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
+          sendTextMessage(senderId,"Go out and play then, you moron." );
         }
       } catch (MessengerApiException e) {
         handleSendException(e);
       } catch (MessengerIOException e) {
         handleIOException(e);
       }
-
-      sendTextMessage(senderId, "Let's try another one :D!");
     };
   }
 
