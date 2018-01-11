@@ -195,6 +195,7 @@ public class CallBackHandler {
           sendGifMessage(senderId,
               giphyData.getData().getImageOriginalUrl());
           sendTextMessage(senderId,"How much cash do you want to start with?" );
+          int cash = Integer.valueOf(event.getText());
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId, "Go out and play then, you moron.");
