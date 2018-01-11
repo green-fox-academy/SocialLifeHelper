@@ -38,6 +38,7 @@ public class CallBackHandler {
   public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
   public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
   public static final String USELESS = "USELESS";
+  public static final String WEIRD = "WEIRD";
 
   private static int cash;//cash the user bets with
   private static int bet;//how much the user wants to bet
@@ -139,10 +140,10 @@ public class CallBackHandler {
         .addTextQuickReply("XKCD comic", XKCD).toList()
         .addTextQuickReply("Napirajz", NAPIRAJZ).toList()
         .addTextQuickReply("GIPHY", JUSTAGIF).toList()
-
+        .addTextQuickReply("I feel lucky", WEIRD ).toList()
         .build();
 
-    this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
+    this.sendClient.sendTextMessage(recipientId, "Pick something to play with", quickReplies);
   }
 
   private void sendQuickYesNoReply(String recipientId)
