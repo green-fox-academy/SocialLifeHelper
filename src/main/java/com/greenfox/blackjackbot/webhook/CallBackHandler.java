@@ -110,6 +110,7 @@ public class CallBackHandler {
         if (lower.length() > 0) {
           sendTextMessage(senderId,
               "Hello, do you want to play");
+          sendQuickYesNoReply(senderId);
         } else {
           sendReadReceipt(senderId);
           sendTypingOn(senderId);
@@ -122,9 +123,7 @@ public class CallBackHandler {
       } catch (IOException e) {
         handleIOException(e);
       }
-    }
-
-        ;
+    };
   }
 
   private void sendSpringDoc(String recipientId, String keyword)
@@ -143,45 +142,16 @@ public class CallBackHandler {
     final List<Button> firstLink = Button.newListBuilder()
         .addUrlButton("Open Link", searchResults.get(0).getLink()).toList()
         .build();
-    final List<Button> secondLink = Button.newListBuilder()
-        .addUrlButton("Open Link", searchResults.get(1).getLink()).toList()
-        .build();
-    final List<Button> thirdtLink = Button.newListBuilder()
-        .addUrlButton("Open Link", searchResults.get(2).getLink()).toList()
-        .build();
-    final List<Button> searchLink = Button.newListBuilder()
-        .addUrlButton("Open Link", ("https://spring.io/search?q=").concat(keyword)).toList()
-        .build();
 
     final GenericTemplate genericTemplate = GenericTemplate.newBuilder()
         .addElements()
         .addElement(searchResults.get(0).getTitle())
         .subtitle(searchResults.get(0).getSubtitle())
         .itemUrl(searchResults.get(0).getLink())
-        .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
         .buttons(firstLink)
-        .toList()
-        .addElement(searchResults.get(1).getTitle())
-        .subtitle(searchResults.get(1).getSubtitle())
-        .itemUrl(searchResults.get(1).getLink())
-        .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-        .buttons(secondLink)
-        .toList()
-        .addElement(searchResults.get(2).getTitle())
-        .subtitle(searchResults.get(2).getSubtitle())
-        .itemUrl(searchResults.get(2).getLink())
-        .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-        .buttons(thirdtLink)
-        .toList()
-        .addElement("All results " + countResult)
-        .subtitle("Spring Search Result")
-        .itemUrl(("https://spring.io/search?q=").concat(keyword))
-        .imageUrl("https://upload.wikimedia.org/wikipedia/en/2/20/Pivotal_Java_Spring_Logo.png")
-        .buttons(searchLink)
         .toList()
         .done()
         .build();
-
     this.sendClient.sendTemplate(recipientId, genericTemplate);
   }
 
@@ -198,7 +168,17 @@ public class CallBackHandler {
         .addTextQuickReply("More cards pls!", NOT_GOOD_ACTION).toList()
         .build();
 
-    this.sendClient.sendTextMessage(recipientId, "Do zou want more cards?", quickReplies);
+    this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
+  }
+
+  private void sendQuickYesNoReply(String recipientId)
+      throws MessengerApiException, MessengerIOException {
+    final List<QuickReply> quickReplies = QuickReply.newListBuilder()
+        .addTextQuickReply("Yes", GOOD_ACTION).toList()
+        .addTextQuickReply("No", NOT_GOOD_ACTION).toList()
+        .build();
+
+    this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
   }
 
   private void sendReadReceipt(String recipientId)
