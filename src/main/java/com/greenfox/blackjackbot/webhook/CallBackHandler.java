@@ -1,4 +1,4 @@
-package com.greenfox.blackjackbot;
+package com.greenfox.blackjackbot.webhook;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
