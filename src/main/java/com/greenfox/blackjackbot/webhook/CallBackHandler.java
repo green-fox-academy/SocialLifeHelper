@@ -1,6 +1,7 @@
 package com.greenfox.blackjackbot.webhook;
 
 import at.mukprojects.giphy4j.Giphy;
+import at.mukprojects.giphy4j.entity.search.SearchFeed;
 import at.mukprojects.giphy4j.entity.search.SearchRandom;
 import at.mukprojects.giphy4j.exception.GiphyException;
 import com.github.messenger4j.MessengerPlatform;
@@ -13,6 +14,7 @@ import com.github.messenger4j.receive.handlers.*;
 import com.github.messenger4j.send.*;
 import com.greenfox.blackjackbot.blackjack.Card;
 import java.util.ArrayList;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,9 @@ public class CallBackHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(CallBackHandler.class);
 
-  public static final String GOOD_ACTION = "DEVELOPER_DEFINED_PAYLOAD_FOR_GOOD_ACTION";
-  public static final String NOT_GOOD_ACTION = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOT_GOOD_ACTION";
+  public static final String XKCD = "DEVELOPER_DEFINED_PAYLOAD_FOR_GOOD_ACTION";
+  public static final String NAPIRAJZ = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOT_GOOD_ACTION";
+  public static final String JUSTAGIF = "DEVELOPER_DEFINED_PAYLOAD_FOR_GIF_ACTION";
   public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
   public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
 
@@ -132,8 +135,10 @@ public class CallBackHandler {
   private void sendQuickReply(String recipientId)
       throws MessengerApiException, MessengerIOException {
     final List<QuickReply> quickReplies = QuickReply.newListBuilder()
-        .addTextQuickReply("No thanks.", GOOD_ACTION).toList()
-        .addTextQuickReply("More cards pls!", NOT_GOOD_ACTION).toList()
+        .addTextQuickReply("XKCD comic", XKCD).toList()
+        .addTextQuickReply("Napirajz", NAPIRAJZ).toList()
+        .addTextQuickReply("GIPHY", JUSTAGIF).toList()
+
         .build();
 
     this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
@@ -176,19 +181,18 @@ public class CallBackHandler {
           quickReplyPayload);
 
       try {
-        if (quickReplyPayload.equals(GOOD_ACTION)) {
-          SearchRandom giphyData = giphy.searchRandom("okay");
-          sendGifMessage(senderId,
-              giphyData.getData().getImageOriginalUrl());
-        } else if (quickReplyPayload.equals(NOT_GOOD_ACTION)) {
-          sendGifMessage(senderId, "https://media.giphy.com/media/26ybx7nkZXtBkEYko/giphy.gif");
-        } else if (quickReplyPayload.equals(PLAY)) {
+        if (quickReplyPayload.equals(PLAY)) {
           SearchRandom giphyData = giphy.searchRandom("cool");
           sendGifMessage(senderId,
               giphyData.getData().getImageOriginalUrl());
-          sendTextMessage(senderId,"How much cash do you want to start with?" );
-          cashTextMessageEventHandler();
-          int cash = Integer.valueOf(event.getText());
+          sendQuickReply(senderId);
+        } else if (quickReplyPayload.equals(XKCD)) {
+          sendTextMessage(senderId, "https://xkcd.com/" + generateRandom());
+        } else if (quickReplyPayload.equals(NAPIRAJZ)) {
+          sendTextMessage(senderId, "http://napirajz.hu/?p=" + generateRandom());
+        } else if (quickReplyPayload.equals(JUSTAGIF)) {
+          SearchFeed feed = giphy.trend();
+          feed.getDataList().get(0).getImages().getOriginal().getUrl();
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId, "Go outside then, you moron.");
@@ -203,28 +207,13 @@ public class CallBackHandler {
     };
   }
 
-  private TextMessageEventHandler cashTextMessageEventHandler() {
-    return event -> {
-      logger.debug("Received TextMessageEvent: {}", event);
 
-      final String messageId = event.getMid();
-      final String messageText = event.getText();
-      final String senderId = event.getSender().getId();
-      final Date timestamp = event.getTimestamp();
-
-      logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
-          messageId, messageText, senderId, timestamp);
-
-      try {
-        String lower = messageText.toLowerCase();
-        sendReadReceipt(senderId);
-        sendTypingOn(senderId);
-        sendTextMessage(senderId, messageText );
-        sendTypingOff(senderId);
-      } catch (MessengerApiException | MessengerIOException e) {
-        handleSendException(e);
-      }
-    };
+  public Integer generateRandom() {
+    Random r = new Random();
+    int lowerBound = 1;
+    int upperBound = 1940;
+    int result = r.nextInt(upperBound - lowerBound) + lowerBound;
+    return result;
   }
 
   private PostbackEventHandler newPostbackEventHandler() {
