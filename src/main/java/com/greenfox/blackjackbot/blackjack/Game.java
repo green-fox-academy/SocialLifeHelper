@@ -16,6 +16,8 @@ public class Game {
     private static ArrayList<Card> hand;//represents the user's hand
     private static int handvalue;//the value of the user's hand
     private static String name;//name of the user
+    public static Deck deck;
+    public static Dealer dealer;
 
 
     public Game() {
@@ -28,10 +30,10 @@ public class Game {
         cash = money.nextInt();
         System.out.println("You start with cash: "+cash);
         while(cash>0){
-            Deck deck = new Deck();//initialize deck, dealer, hands, and set the bet.
+            deck = new Deck();//initialize deck, dealer, hands, and set the bet.
             deck.shuffle();
             AceCounter=0;
-            Dealer dealer = new Dealer(deck);
+            dealer = new Dealer(deck);
             List<Card> hand = new ArrayList<>();
             hand.add(deck.drawCard());
             hand.add(deck.drawCard());
@@ -212,29 +214,25 @@ public class Game {
     /*
      * Called if the user wins.
      */
-    public static void Win()
+    public static String Win()
     {
-        System.out.println("Congratulations, you win!");
-        cash=cash+bet;
-        System.out.println("Cash: "+cash);
+        return "Congratulations, you win!";
+
     }
     /*
      * Called if the user loses.
      */
-    public static void Lose()
+    public static String Lose()
     {
-        System.out.println("Sorry, you lose!");
-        cash=cash-bet;
-        System.out.println("Cash: "+cash);
+        return "Sorry, you lose!";
     }
     /*
      * Called if the user pushes
      */
-    public static void Push()
+    public static String Push()
     {
-        System.out.println("It's a push!");
-        System.out.println("You get your money back.");
-        System.out.println("Cash: "+cash);
+        return "It's a push!";
+
     }
     /*
      * Adds a card to user's hand and calculates the value of that hand. Aces are taken into account.

@@ -67,6 +67,8 @@ public class CallBackHandler {
     private final MessengerReceiveClient receiveClient;
     private final MessengerSendClient sendClient;
 
+    int dealerhand;
+
     @Autowired
     Game game;
 
@@ -239,10 +241,10 @@ public class CallBackHandler {
                 } else if (quickReplyPayload.equals(TWENTY)) {
                     int cash = 20;
 
-                    while(cash > 0) {
+                    while (cash > 0) {
                         Deck deck = new Deck();
                         deck.shuffle();
-                        AceCounter=0;
+                        AceCounter = 0;
                         Dealer dealer = new Dealer(deck);
                         List<Card> hand = new ArrayList<>();
                         hand.add(deck.drawCard());
@@ -251,79 +253,58 @@ public class CallBackHandler {
                         int handvalue = calcHandValue(hand);
 
                         dealer.showFirstCard();
-                        if(game.hasBlackJack(handvalue) && dealer.hasBlackJack())//check if both the user and dealer have blackjack.
-                        {
+                        if (game.hasBlackJack(handvalue) && dealer.hasBlackJack()) {//check if both the user and dealer have blackjack.
+
                             game.Push();
-                        }
-                        else if(game.hasBlackJack(handvalue))//check if the user has blackjack.
-                        {
-
-                            sendTextMessage(senderId,"You have BlackJack!");
-
+                        } else if (game.hasBlackJack(handvalue)) {//check if the user has blackjack.
+                            sendTextMessage(senderId, "You have BlackJack!");
                             game.Win();
-                        }
-                        else if(dealer.hasBlackJack())//check if the dealer has blackjack.
-                        {
-                           sendTextMessage(senderId, "Here is the dealer's hand:");
+                        } else if (dealer.hasBlackJack()) { //check if the dealer has blackjack.
+                            sendTextMessage(senderId, "Here is the dealer's hand:");
                             dealer.showHand();
                             game.Lose();
-                        }
-                        else {
+                        } else {
                             sendTextMessage(senderId, "Would you like to hit or stand?");//ask if the user will hit or stand
                             sendQuickHitOrStand(senderId);
-
-
-                            if(hitter.equals("stand"))//lets the user stand.
-                            {
-                                int dealerhand = dealer.takeTurn(deck);//takes the turn for the dealer.
-                                System.out.println("Here is the dealer's hand:");
-                                dealer.showHand();
-                                if(dealerhand>21)//if the dealer busted, user wins.
-                                {
-                                    game.Win();
-                                }
-                                else
-                                {
-                                    int you = 21-handvalue;//check who is closer to 21 and determine winner
-                                    int deal = 21-dealerhand;
-                                    if(you==deal)
-                                    {
-                                        game.Push();
-                                    }
-                                    if(you<deal)
-                                    {
-                                        game.Win();
-                                    }
-                                    if(deal<you)
-                                    {
-                                        game.Lose();
-                                    }
-                                }
-                            }
                         }
                     }
 
                 } else if (quickReplyPayload.equals(HIT)) {
-
-                        game.Hit(deck, hand);
-                        System.out.println(hand);
-                        handvalue = calcHandValue(hand);
-                        if(game.checkBust(handvalue))//checks if the user busted
-                        {
-                            game.Lose();
-                            break;
-                        }
-                        if(handvalue<=21 && hand.size()==5)//checks for a five card trick.
-                        {
-                            game.fivecardtrick();
-                            break;
-                        }
-                        System.out.println("Would you like to hit or stand?");
-                        hitter = hitorstand.nextLine();
+                    game.Hit(game.deck, hand);
+                    System.out.println(hand);
+                    handvalue = calcHandValue(hand);
+                    if (game.checkBust(handvalue)) { //checks if the user busted
+                        game.Lose();
                     }
+                    if (handvalue <= 21 && hand.size() == 5) { //checks for a five card trick.
+                        game.fivecardtrick();
+                    }
+                    sendTextMessage(senderId, "Would you like to hit or stand?");//ask if the user will hit or stand
+                    sendQuickHitOrStand(senderId);
 
+                } else if (quickReplyPayload.equals(STAND)) {
 
-                else if (quickReplyPayload.equals(FIFTY)) {
+                    dealerhand = game.dealer.takeTurn(game.deck);//takes the turn for the dealer.
+
+                    sendTextMessage(senderId, "Here is the dealer's hand:");
+                    sendTextMessage(senderId, game.dealer.showHand());
+
+                    if (dealerhand > 21) {//if the dealer busted, user wins.{
+                        sendTextMessage(senderId, game.Win());
+                    } else {
+                        int you = 21 - handvalue;//check who is closer to 21 and determine winner
+                        int deal = 21 - dealerhand;
+                        if (you == deal) {
+                            game.Push();
+                        }
+                        if (you < deal) {
+                            game.Win();
+                        }
+                        if (deal < you) {
+                            game.Lose();
+                        }
+                    }
+                } else if (quickReplyPayload.equals(FIFTY)) {
                     int cash = 50;
                 } else {
                     sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
