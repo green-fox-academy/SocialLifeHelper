@@ -219,7 +219,7 @@ public class CallBackHandler {
         String lower = messageText.toLowerCase();
         sendReadReceipt(senderId);
         sendTypingOn(senderId);
-        sendQuickReply(senderId);
+        sendTextMessage(senderId, messageText );
         sendTypingOff(senderId);
       } catch (MessengerApiException | MessengerIOException e) {
         handleSendException(e);
