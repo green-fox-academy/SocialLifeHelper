@@ -9,6 +9,8 @@ import com.github.messenger4j.exceptions.MessengerIOException;
 import com.github.messenger4j.exceptions.MessengerVerificationException;
 import com.github.messenger4j.receive.MessengerReceiveClient;
 import com.github.messenger4j.receive.events.AccountLinkingEvent;
+import com.github.messenger4j.receive.events.QuickReplyMessageEvent;
+import com.github.messenger4j.receive.events.TextMessageEvent;
 import com.github.messenger4j.receive.handlers.*;
 import com.github.messenger4j.send.*;
 import com.github.messenger4j.send.buttons.Button;
@@ -195,6 +197,11 @@ public class CallBackHandler {
                     sendGifMessage(senderId,
                             giphyData.getData().getImageOriginalUrl());
                     sendTextMessage(senderId,"How much cash do you want to start with?" );
+                    int cash = getCash();
+
+                    if (cash > 0) {
+                        sendTextMessage(senderId, String.valueOf(cash));
+                    }
                 } else {
                     sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
                     sendTextMessage(senderId, "Go out and play then, you moron.");
@@ -207,6 +214,17 @@ public class CallBackHandler {
                 e.printStackTrace();
             }
         };
+    }
+
+    public Integer getCash() {
+        TextMessageEventHandler event = new TextMessageEventHandler() {
+            @Override
+            public void handle(TextMessageEvent event) {
+                int cash = Integer.parseInt(event.getText());
+            }
+        };
+
+        return cash;
     }
 
     private PostbackEventHandler newPostbackEventHandler() {
