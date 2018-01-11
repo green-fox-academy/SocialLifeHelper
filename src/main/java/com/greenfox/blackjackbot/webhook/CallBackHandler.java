@@ -79,8 +79,10 @@ public class CallBackHandler {
             logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
                     messageId, messageText, senderId, timestamp);
 
-            sendTextMessage(senderId, "Hello, this is a random reply...");
-            // sendTextMessage(senderId, "almost :)");
+            sendTextMessage(senderId, "Hi! What is your name?");
+            String name = messageText;
+            sendTextMessage(senderId, "Hello, "+ name +", lets play some BlackJack!");
+
         };
     }
 
