@@ -145,7 +145,7 @@ public class CallBackHandler {
         .addTextQuickReply("dice", PLAYDICE).toList()
         .build();
 
-    this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
+    this.sendClient.sendTextMessage(recipientId, "Pick something you want to play with", quickReplies);
   }
 
   private void sendQuickYesNoReply(String recipientId)
@@ -207,7 +207,7 @@ public class CallBackHandler {
 
             if (user > bot) {
                 sendTextMessage(senderId, "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
-            } else if (bot < user) {
+            } else if (bot > user) {
                 sendTextMessage(senderId, "You lost. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
             } else {
                 sendTextMessage(senderId, "Draw. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
