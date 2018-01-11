@@ -112,17 +112,10 @@ public class CallBackHandler {
 
       try {
         String lower = messageText.toLowerCase();
-        if (lower.length() > 0) {
-          sendReadReceipt(senderId);
-          sendTypingOn(senderId);
-          sendQuickYesNoReply(senderId);
-          sendTypingOff(senderId);
-        } else {
-          sendReadReceipt(senderId);
-          sendTypingOn(senderId);
-          sendQuickReply(senderId);
-          sendTypingOff(senderId);
-        }
+        sendReadReceipt(senderId);
+        sendTypingOn(senderId);
+        sendQuickYesNoReply(senderId);
+        sendTypingOff(senderId);
       } catch (MessengerApiException | MessengerIOException e) {
         handleSendException(e);
       }
@@ -194,7 +187,7 @@ public class CallBackHandler {
               giphyData.getData().getImageOriginalUrl());
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
-          sendTextMessage(senderId,"Go out and play then, you moron." );
+          sendTextMessage(senderId, "Go out and play then, you moron.");
         }
       } catch (MessengerApiException e) {
         handleSendException(e);
