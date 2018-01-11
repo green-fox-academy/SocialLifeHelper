@@ -37,6 +37,7 @@ public class CallBackHandler {
   public static final String JUSTAGIF = "DEVELOPER_DEFINED_PAYLOAD_FOR_GIF_ACTION";
   public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
   public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
+  public static final String USELESS = "USELESS";
 
   private static int cash;//cash the user bets with
   private static int bet;//how much the user wants to bet
@@ -149,6 +150,7 @@ public class CallBackHandler {
     final List<QuickReply> quickReplies = QuickReply.newListBuilder()
         .addTextQuickReply("Yes", PLAY).toList()
         .addTextQuickReply("No", NOPLAY).toList()
+        .addTextQuickReply("I feel useless", USELESS ).toList()
         .build();
 
     this.sendClient.sendTextMessage(recipientId, "Do you want to play?", quickReplies);
@@ -193,7 +195,10 @@ public class CallBackHandler {
         } else if (quickReplyPayload.equals(JUSTAGIF)) {
           SearchFeed feed = giphy.trend();
           sendGifMessage(senderId, feed.getDataList().get(0).getImages().getOriginal().getUrl());
-        } else {
+        } else if (quickReplyPayload.equals(USELESS)) {
+          sendTextMessage(senderId, "http://www.theuselessweb.com/");
+        }
+        else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId, "Go outside then, you moron.");
         }
