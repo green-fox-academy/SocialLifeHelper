@@ -44,6 +44,8 @@ public class CallBackHandler {
     public static final String NOT_GOOD_ACTION = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOT_GOOD_ACTION";
     public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
     public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
+    public static final String TWENTY = "20";
+    public static final String FIFTY = "50";
 
     private static int cash;//cash the user bets with
     private static int bet;//how much the user wants to bet
@@ -159,6 +161,16 @@ public class CallBackHandler {
         this.sendClient.sendTextMessage(recipientId, "Do you want to play?", quickReplies);
     }
 
+    private void sendCashButtons(String recipientId)
+            throws MessengerApiException, MessengerIOException {
+        final List<QuickReply> quickReplies = QuickReply.newListBuilder()
+                .addTextQuickReply("20", TWENTY).toList()
+                .addTextQuickReply("50", FIFTY).toList()
+                .build();
+
+        this.sendClient.sendTextMessage(recipientId, "How much cash would you like to play with", quickReplies);
+    }
+
     private void sendReadReceipt(String recipientId)
             throws MessengerApiException, MessengerIOException {
         this.sendClient.sendSenderAction(recipientId, SenderAction.MARK_SEEN);
@@ -196,12 +208,15 @@ public class CallBackHandler {
                     SearchRandom giphyData = giphy.searchRandom("cool");
                     sendGifMessage(senderId,
                             giphyData.getData().getImageOriginalUrl());
-                    sendTextMessage(senderId,"How much cash do you want to start with?" );
-                    int cash = getCash();
 
-                    if (cash > 0) {
-                        sendTextMessage(senderId, String.valueOf(cash));
-                    }
+                    // sendTextMessage(senderId,"How much cash do you want to start with?" );
+
+                    sendCashButtons(senderId);
+
+                } else if (quickReplyPayload.equals(TWENTY)) {
+                    int cash = 20;
+                    
+
                 } else {
                     sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
                     sendTextMessage(senderId, "Go out and play then, you moron.");
@@ -214,17 +229,6 @@ public class CallBackHandler {
                 e.printStackTrace();
             }
         };
-    }
-
-    public Integer getCash() {
-        TextMessageEventHandler event = new TextMessageEventHandler() {
-            @Override
-            public void handle(TextMessageEvent event) {
-                int cash = Integer.parseInt(event.getText());
-            }
-        };
-
-        return cash;
     }
 
     private PostbackEventHandler newPostbackEventHandler() {
