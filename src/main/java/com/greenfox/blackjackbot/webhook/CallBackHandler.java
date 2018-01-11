@@ -1,4 +1,4 @@
-package com.greenfox.blackjackbot;
+package com.greenfox.blackjackbot.webhook;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,10 +77,10 @@ public class CallBackHandler {
             final Date timestamp = event.getTimestamp();
 
             logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
-                messageId, messageText, senderId, timestamp);
+                    messageId, messageText, senderId, timestamp);
 
             sendTextMessage(senderId, "Hello, this is a random reply...");
-            sendTextMessage(senderId, "almost :)");
+            // sendTextMessage(senderId, "almost :)");
         };
     }
 

@@ -14,11 +14,6 @@ public class BlackjackbotApplication {
 
 	private static final Logger logger = LoggerFactory.getLogger(BlackjackbotApplication.class);
 
-	/**
-	 * Initializes the {@code MessengerSendClient}.
-	 *
-	 * @param pageAccessToken the generated {@code Page Access Token}
-	 */
 	@Bean
 	public MessengerSendClient messengerSendClient(@Value("${messenger4j.pageAccessToken}") String pageAccessToken) {
 		logger.debug("Initializing MessengerSendClient - pageAccessToken: {}", pageAccessToken);
