@@ -11,14 +11,8 @@ import com.github.messenger4j.receive.MessengerReceiveClient;
 import com.github.messenger4j.receive.events.AccountLinkingEvent;
 import com.github.messenger4j.receive.handlers.*;
 import com.github.messenger4j.send.*;
-import com.github.messenger4j.send.buttons.Button;
-import com.github.messenger4j.send.templates.GenericTemplate;
 import com.greenfox.blackjackbot.blackjack.Card;
-import com.greenfox.blackjackbot.domain.SearchResult;
 import java.util.ArrayList;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/callback")
@@ -195,10 +187,11 @@ public class CallBackHandler {
           sendGifMessage(senderId,
               giphyData.getData().getImageOriginalUrl());
           sendTextMessage(senderId,"How much cash do you want to start with?" );
+          cashTextMessageEventHandler();
           int cash = Integer.valueOf(event.getText());
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
-          sendTextMessage(senderId, "Go out and play then, you moron.");
+          sendTextMessage(senderId, "Go outside then, you moron.");
         }
       } catch (MessengerApiException e) {
         handleSendException(e);
@@ -206,6 +199,30 @@ public class CallBackHandler {
         handleIOException(e);
       } catch (GiphyException e) {
         e.printStackTrace();
+      }
+    };
+  }
+
+  private TextMessageEventHandler cashTextMessageEventHandler() {
+    return event -> {
+      logger.debug("Received TextMessageEvent: {}", event);
+
+      final String messageId = event.getMid();
+      final String messageText = event.getText();
+      final String senderId = event.getSender().getId();
+      final Date timestamp = event.getTimestamp();
+
+      logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
+          messageId, messageText, senderId, timestamp);
+
+      try {
+        String lower = messageText.toLowerCase();
+        sendReadReceipt(senderId);
+        sendTypingOn(senderId);
+        sendQuickReply(senderId);
+        sendTypingOff(senderId);
+      } catch (MessengerApiException | MessengerIOException e) {
+        handleSendException(e);
       }
     };
   }
