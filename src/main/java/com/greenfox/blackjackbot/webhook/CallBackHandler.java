@@ -12,8 +12,6 @@ import com.github.messenger4j.receive.MessengerReceiveClient;
 import com.github.messenger4j.receive.events.AccountLinkingEvent;
 import com.github.messenger4j.receive.handlers.*;
 import com.github.messenger4j.send.*;
-import com.greenfox.blackjackbot.blackjack.Card;
-import java.util.ArrayList;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -41,13 +39,6 @@ public class CallBackHandler {
   public static final String USELESS = "USELESS";
 
   public static final String PLAYDICE = "DICE";
-
-  private static int cash;//cash the user bets with
-  private static int bet;//how much the user wants to bet
-  private static int AceCounter;//how many aces are in the user's hand
-  private static ArrayList<Card> hand;//represents the user's hand
-  private static int handvalue;//the value of the user's hand
-  private static String name;//name of the user
 
   private final MessengerReceiveClient receiveClient;
   private final MessengerSendClient sendClient;
