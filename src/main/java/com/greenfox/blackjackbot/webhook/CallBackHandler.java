@@ -192,7 +192,7 @@ public class CallBackHandler {
           sendTextMessage(senderId, "http://napirajz.hu/?p=" + generateRandom());
         } else if (quickReplyPayload.equals(JUSTAGIF)) {
           SearchFeed feed = giphy.trend();
-          feed.getDataList().get(0).getImages().getOriginal().getUrl();
+          sendGifMessage(senderId, feed.getDataList().get(0).getImages().getOriginal().getUrl());
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId, "Go outside then, you moron.");
