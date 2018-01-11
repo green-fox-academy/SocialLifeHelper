@@ -7,7 +7,7 @@ public class Dealer {
     ArrayList<Card> hand;
     private int handvalue = 0;
     private Card[] aHand;
-    private static int AceCounter;
+    private int AceCounter;
 
     public Dealer(Deck deck) {
         hand = new ArrayList<>();
@@ -29,22 +29,18 @@ public class Dealer {
         }
     }
 
-     // Prints the dealer's first card (the card face up at the beginning of a blackjack game).
+    // Prints the dealer's first card (the card face up at the beginning of a blackjack game).
     public void showFirstCard() {
         Card[] firstCard = new Card[]{};
         firstCard = hand.toArray(firstCard);
         System.out.println("[" + firstCard[0] + "]");
     }
 
-     // Gives the dealer another card and updates the value of his hand. Takes into account the value of aces.
+    // Gives the dealer another card and updates the value of his hand. Takes into account the value of aces.
     public void Hit(Deck deck) {
         hand.add(deck.drawCard());
         aHand = hand.toArray(aHand);
         handvalue = 0;
-        getHandvalue(aHand,handvalue );
-    }
-
-    public static int getHandvalue(Card[] aHand, int handvalue) {
         for (int i = 0; i < aHand.length; i++) {
             handvalue += aHand[i].getValue();
             if (aHand[i].getValue() == 11) {
@@ -55,10 +51,9 @@ public class Dealer {
                 AceCounter--;
             }
         }
-        return handvalue;
     }
 
-     // Determines if the dealer wants to hit according to classic Blackjack rules.
+    // Determines if the dealer wants to hit according to classic Blackjack rules.
     public boolean wantsToHit() {
         if (handvalue < 17) {
             return true;
@@ -66,7 +61,7 @@ public class Dealer {
         return false;
     }
 
-     // Returns true if the dealer has blackjack.
+    // Returns true if the dealer has blackjack.
     public boolean hasBlackJack() {
         if (hand.size() == 2 && handvalue == 21) {
             System.out.println("The dealer has blackjack!");
@@ -75,12 +70,12 @@ public class Dealer {
         return false;
     }
 
-     // Prints the dealer's hand.
+    // Prints the dealer's hand.
     public void showHand() {
         System.out.println(hand);
     }
 
-     // Returns the value of the dealer's hand.
+    // Returns the value of the dealer's hand.
     public int getHandValue() {
         return handvalue;
     }
@@ -94,7 +89,7 @@ public class Dealer {
         return false;
     }
 
-     // Takes the turn for the dealer and returns the value of his hand.
+    // Takes the turn for the dealer and returns the value of his hand.
     public int takeTurn(Deck deck) {
         while (wantsToHit()) {
             System.out.println("The dealer hits");
