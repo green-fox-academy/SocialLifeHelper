@@ -13,7 +13,9 @@ import com.github.messenger4j.receive.handlers.*;
 import com.github.messenger4j.send.*;
 import com.github.messenger4j.send.buttons.Button;
 import com.github.messenger4j.send.templates.GenericTemplate;
+import com.greenfox.blackjackbot.blackjack.Card;
 import com.greenfox.blackjackbot.domain.SearchResult;
+import java.util.ArrayList;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -40,6 +42,13 @@ public class CallBackHandler {
   public static final String NOT_GOOD_ACTION = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOT_GOOD_ACTION";
   public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
   public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
+
+  private static int cash;//cash the user bets with
+  private static int bet;//how much the user wants to bet
+  private static int AceCounter;//how many aces are in the user's hand
+  private static ArrayList<Card> hand;//represents the user's hand
+  private static int handvalue;//the value of the user's hand
+  private static String name;//name of the user
 
   private final MessengerReceiveClient receiveClient;
   private final MessengerSendClient sendClient;
@@ -185,6 +194,7 @@ public class CallBackHandler {
           SearchRandom giphyData = giphy.searchRandom("cool");
           sendGifMessage(senderId,
               giphyData.getData().getImageOriginalUrl());
+          sendTextMessage(senderId,"How much cash do you want to start with?" );
         } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId, "Go out and play then, you moron.");
