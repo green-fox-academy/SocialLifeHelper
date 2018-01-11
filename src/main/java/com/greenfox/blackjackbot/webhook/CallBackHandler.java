@@ -133,7 +133,7 @@ public class CallBackHandler {
         .addTextQuickReply("XKCD comic", XKCD).toList()
         .addTextQuickReply("Napirajz", NAPIRAJZ).toList()
         .addTextQuickReply("GIPHY", JUSTAGIF).toList()
-        .addTextQuickReply("dice", PLAYDICE).toList()
+        .addTextQuickReply("Dice", PLAYDICE).toList()
         .build();
 
     this.sendClient.sendTextMessage(recipientId, "Pick something you want to play with", quickReplies);
@@ -197,11 +197,11 @@ public class CallBackHandler {
             int bot = generateRandomForDice();
 
             if (user > bot) {
-                sendTextMessage(senderId, "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
+                sendTextMessage(senderId, "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(bot) );
             } else if (bot > user) {
-                sendTextMessage(senderId, "You lost. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
+                sendTextMessage(senderId, "You lost. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(bot) );
             } else {
-                sendTextMessage(senderId, "Draw. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
+                sendTextMessage(senderId, "Draw. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(bot) );
             }
         }
         else {
