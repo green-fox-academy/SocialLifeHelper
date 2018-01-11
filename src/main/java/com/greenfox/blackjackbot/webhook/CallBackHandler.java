@@ -12,8 +12,6 @@ import com.github.messenger4j.receive.MessengerReceiveClient;
 import com.github.messenger4j.receive.events.AccountLinkingEvent;
 import com.github.messenger4j.receive.handlers.*;
 import com.github.messenger4j.send.*;
-import com.greenfox.blackjackbot.blackjack.Card;
-import java.util.ArrayList;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +37,7 @@ public class CallBackHandler {
   public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
   public static final String USELESS = "USELESS";
   public static final String WEIRD = "WEIRD";
-
-  private static int cash;//cash the user bets with
-  private static int bet;//how much the user wants to bet
-  private static int AceCounter;//how many aces are in the user's hand
-  private static ArrayList<Card> hand;//represents the user's hand
-  private static int handvalue;//the value of the user's hand
-  private static String name;//name of the user
+  public static final String PLAYDICE = "DICE";
 
   private final MessengerReceiveClient receiveClient;
   private final MessengerSendClient sendClient;
@@ -140,7 +132,8 @@ public class CallBackHandler {
         .addTextQuickReply("XKCD comic", XKCD).toList()
         .addTextQuickReply("Napirajz", NAPIRAJZ).toList()
         .addTextQuickReply("GIPHY", JUSTAGIF).toList()
-        .addTextQuickReply("I feel lucky", WEIRD ).toList()
+        .addTextQuickReply("I feel lucky", WEIRD).toList()
+        .addTextQuickReply("Dice", PLAYDICE).toList()
         .build();
 
     this.sendClient.sendTextMessage(recipientId, "Pick something to play with", quickReplies);
@@ -151,7 +144,7 @@ public class CallBackHandler {
     final List<QuickReply> quickReplies = QuickReply.newListBuilder()
         .addTextQuickReply("Yes", PLAY).toList()
         .addTextQuickReply("No", NOPLAY).toList()
-        .addTextQuickReply("I feel useless", USELESS ).toList()
+        .addTextQuickReply("I feel useless", USELESS).toList()
         .build();
 
     this.sendClient.sendTextMessage(recipientId, "Do you want to play?", quickReplies);
@@ -187,8 +180,7 @@ public class CallBackHandler {
         if (quickReplyPayload.equals(PLAY)) {
           SearchRandom giphyData = giphy.searchRandom("cool");
           sendGifMessage(senderId,
-              giphyData.getData().getImageOriginalUrl());
-          sendQuickReply(senderId);
+              "https://media.giphy.com/media/rrFcUcN3MFmta/giphy.gif");
         } else if (quickReplyPayload.equals(XKCD)) {
           sendTextMessage(senderId, "https://xkcd.com/" + generateRandom());
         } else if (quickReplyPayload.equals(NAPIRAJZ)) {
@@ -197,12 +189,28 @@ public class CallBackHandler {
           SearchFeed feed = giphy.trend();
           sendGifMessage(senderId, feed.getDataList().get(0).getImages().getOriginal().getUrl());
         } else if (quickReplyPayload.equals(WEIRD)) {
-          sendTextMessage(senderId, "http://weirdorconfusing.com/" );
-        }
-        else if (quickReplyPayload.equals(USELESS)) {
+          sendTextMessage(senderId, "http://weirdorconfusing.com/");
+        } else if (quickReplyPayload.equals(USELESS)) {
           sendTextMessage(senderId, "http://www.theuselessweb.com/");
-        }
-        else {
+        } else if (quickReplyPayload.equals(PLAYDICE)) {
+
+          int user = generateRandomForDice();
+          int bot = generateRandomForDice();
+
+          if (user > bot) {
+            sendTextMessage(senderId,
+                "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String
+                    .valueOf(bot));
+          } else if (bot > user) {
+            sendTextMessage(senderId,
+                "You lost. Your score: " + String.valueOf(user) + " Bot's score: " + String
+                    .valueOf(bot));
+          } else {
+            sendTextMessage(senderId,
+                "Draw. Your score: " + String.valueOf(user) + " Bot's score: " + String
+                    .valueOf(bot));
+          }
+        } else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
           sendTextMessage(senderId, "Go outside then, you moron.");
         }
@@ -221,6 +229,14 @@ public class CallBackHandler {
     Random r = new Random();
     int lowerBound = 1;
     int upperBound = 1940;
+    int result = r.nextInt(upperBound - lowerBound) + lowerBound;
+    return result;
+  }
+
+  public Integer generateRandomForDice() {
+    Random r = new Random();
+    int lowerBound = 1;
+    int upperBound = 6;
     int result = r.nextInt(upperBound - lowerBound) + lowerBound;
     return result;
   }
