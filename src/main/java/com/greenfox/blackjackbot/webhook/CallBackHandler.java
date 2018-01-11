@@ -170,7 +170,7 @@ public class CallBackHandler {
   }
 
   private QuickReplyMessageEventHandler newQuickReplyMessageEventHandler() {
-    Giphy giphy = new Giphy("P5Zwp1RjW4BcEyjPcviLBigECnkKM2Pb");
+    Giphy giphy = new Giphy(System.getenv("GIPHY_API_KEY"));
     return event -> {
       logger.debug("Received QuickReplyMessageEvent: {}", event);
 
