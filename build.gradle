@@ -31,4 +31,5 @@ dependencies {
 	runtime('org.springframework.boot:spring-boot-devtools')
 //	runtime('org.postgresql:postgresql')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile group: 'at.mukprojects', name: 'giphy4j', version: '1.0.1'
 }
