@@ -15,6 +15,7 @@ import com.github.messenger4j.send.*;
 import com.greenfox.blackjackbot.blackjack.Card;
 import java.util.ArrayList;
 import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class CallBackHandler {
   public static final String PLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_PLAY";
   public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
   public static final String USELESS = "USELESS";
+
+  public static final String PLAYDICE = "DICE";
 
   private static int cash;//cash the user bets with
   private static int bet;//how much the user wants to bet
@@ -139,7 +142,7 @@ public class CallBackHandler {
         .addTextQuickReply("XKCD comic", XKCD).toList()
         .addTextQuickReply("Napirajz", NAPIRAJZ).toList()
         .addTextQuickReply("GIPHY", JUSTAGIF).toList()
-
+        .addTextQuickReply("dice", PLAYDICE).toList()
         .build();
 
     this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
@@ -197,6 +200,18 @@ public class CallBackHandler {
           sendGifMessage(senderId, feed.getDataList().get(0).getImages().getOriginal().getUrl());
         } else if (quickReplyPayload.equals(USELESS)) {
           sendTextMessage(senderId, "http://www.theuselessweb.com/");
+        } else if (quickReplyPayload.equals(PLAYDICE)) {
+
+            int user = (int) (1 + Math.random() * 6);
+            int bot = (int) (1 + Math.random() * 6);
+
+            if (user > bot) {
+                sendTextMessage(senderId, "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
+            } else if (bot < user) {
+                sendTextMessage(senderId, "You lost. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
+            } else {
+                sendTextMessage(senderId, "Draw. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
+            }
         }
         else {
           sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
