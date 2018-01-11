@@ -178,10 +178,8 @@ public class CallBackHandler {
 
       try {
         if (quickReplyPayload.equals(PLAY)) {
-          SearchRandom giphyData = giphy.searchRandom("cool");
-
           sendGifMessage(senderId,
-              giphyData.getData().getImageOriginalUrl());
+              "https://media.giphy.com/media/GwGXoeb0gm7sc/giphy.gif");
           sendQuickReply(senderId);
         } else if (quickReplyPayload.equals(XKCD)) {
           sendTextMessage(senderId, "https://xkcd.com/" + generateRandom());
