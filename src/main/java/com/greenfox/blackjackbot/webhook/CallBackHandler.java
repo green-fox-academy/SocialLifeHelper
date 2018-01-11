@@ -202,8 +202,8 @@ public class CallBackHandler {
           sendTextMessage(senderId, "http://www.theuselessweb.com/");
         } else if (quickReplyPayload.equals(PLAYDICE)) {
 
-            int user = (int) (1 + Math.random() * 6);
-            int bot = (int) (1 + Math.random() * 6);
+            int user = generateRandomForDice();
+            int bot = generateRandomForDice();
 
             if (user > bot) {
                 sendTextMessage(senderId, "You won. Your score: " + String.valueOf(user) + " Bot's score: " + String.valueOf(user) );
@@ -235,6 +235,14 @@ public class CallBackHandler {
     int result = r.nextInt(upperBound - lowerBound) + lowerBound;
     return result;
   }
+
+    public Integer generateRandomForDice() {
+        Random r = new Random();
+        int lowerBound = 1;
+        int upperBound = 6;
+        int result = r.nextInt(upperBound - lowerBound) + lowerBound;
+        return result;
+    }
 
   private PostbackEventHandler newPostbackEventHandler() {
     return event -> {
