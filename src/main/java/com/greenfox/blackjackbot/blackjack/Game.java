@@ -1,9 +1,13 @@
 package com.greenfox.blackjackbot.blackjack;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+@Component
 public class Game {
 
     private static int cash;//cash the user bets with

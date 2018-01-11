@@ -16,6 +16,9 @@ import com.github.messenger4j.send.*;
 import com.github.messenger4j.send.buttons.Button;
 import com.github.messenger4j.send.templates.GenericTemplate;
 import com.greenfox.blackjackbot.blackjack.Card;
+import com.greenfox.blackjackbot.blackjack.Dealer;
+import com.greenfox.blackjackbot.blackjack.Deck;
+import com.greenfox.blackjackbot.blackjack.Game;
 import com.greenfox.blackjackbot.domain.SearchResult;
 import java.util.ArrayList;
 import org.jsoup.Jsoup;
@@ -32,7 +35,11 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.stream.Collectors;
+
+import static com.greenfox.blackjackbot.blackjack.Game.calcHandValue;
+import static com.greenfox.blackjackbot.blackjack.Game.isyesorno;
 
 @RestController
 @RequestMapping("/callback")
@@ -46,6 +53,9 @@ public class CallBackHandler {
     public static final String NOPLAY = "DEVELOPER_DEFINED_PAYLOAD_FOR_NOPLAY";
     public static final String TWENTY = "20";
     public static final String FIFTY = "50";
+    public static final String BET = "20";
+    public static final String HIT = "HIT";
+    public static final String STAND = "STAND";
 
     private static int cash;//cash the user bets with
     private static int bet;//how much the user wants to bet
@@ -56,6 +66,9 @@ public class CallBackHandler {
 
     private final MessengerReceiveClient receiveClient;
     private final MessengerSendClient sendClient;
+
+    @Autowired
+    Game game;
 
     @Autowired
     public CallBackHandler(@Value("${messenger4j.appSecret}") final String appSecret,
@@ -151,6 +164,16 @@ public class CallBackHandler {
         this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
     }
 
+    private void sendQuickHitOrStand(String recipientId)
+            throws MessengerApiException, MessengerIOException {
+        final List<QuickReply> quickReplies = QuickReply.newListBuilder()
+                .addTextQuickReply("Hit.", HIT).toList()
+                .addTextQuickReply("Stand", STAND).toList()
+                .build();
+
+        this.sendClient.sendTextMessage(recipientId, "Do you want more cards?", quickReplies);
+    }
+
     private void sendQuickYesNoReply(String recipientId)
             throws MessengerApiException, MessengerIOException {
         final List<QuickReply> quickReplies = QuickReply.newListBuilder()
@@ -215,11 +238,96 @@ public class CallBackHandler {
 
                 } else if (quickReplyPayload.equals(TWENTY)) {
                     int cash = 20;
-                    
 
+                    while(cash > 0) {
+                        Deck deck = new Deck();
+                        deck.shuffle();
+                        AceCounter=0;
+                        Dealer dealer = new Dealer(deck);
+                        List<Card> hand = new ArrayList<>();
+                        hand.add(deck.drawCard());
+                        hand.add(deck.drawCard());
+
+                        int handvalue = calcHandValue(hand);
+
+                        dealer.showFirstCard();
+                        if(game.hasBlackJack(handvalue) && dealer.hasBlackJack())//check if both the user and dealer have blackjack.
+                        {
+                            game.Push();
+                        }
+                        else if(game.hasBlackJack(handvalue))//check if the user has blackjack.
+                        {
+
+                            sendTextMessage(senderId,"You have BlackJack!");
+
+                            game.Win();
+                        }
+                        else if(dealer.hasBlackJack())//check if the dealer has blackjack.
+                        {
+                           sendTextMessage(senderId, "Here is the dealer's hand:");
+                            dealer.showHand();
+                            game.Lose();
+                        }
+                        else {
+                            sendTextMessage(senderId, "Would you like to hit or stand?");//ask if the user will hit or stand
+                            sendQuickHitOrStand(senderId);
+
+
+                            if(hitter.equals("stand"))//lets the user stand.
+                            {
+                                int dealerhand = dealer.takeTurn(deck);//takes the turn for the dealer.
+                                System.out.println("Here is the dealer's hand:");
+                                dealer.showHand();
+                                if(dealerhand>21)//if the dealer busted, user wins.
+                                {
+                                    game.Win();
+                                }
+                                else
+                                {
+                                    int you = 21-handvalue;//check who is closer to 21 and determine winner
+                                    int deal = 21-dealerhand;
+                                    if(you==deal)
+                                    {
+                                        game.Push();
+                                    }
+                                    if(you<deal)
+                                    {
+                                        game.Win();
+                                    }
+                                    if(deal<you)
+                                    {
+                                        game.Lose();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                } else if (quickReplyPayload.equals(HIT)) {
+
+                        game.Hit(deck, hand);
+                        System.out.println(hand);
+                        handvalue = calcHandValue(hand);
+                        if(game.checkBust(handvalue))//checks if the user busted
+                        {
+                            game.Lose();
+                            break;
+                        }
+                        if(handvalue<=21 && hand.size()==5)//checks for a five card trick.
+                        {
+                            game.fivecardtrick();
+                            break;
+                        }
+                        System.out.println("Would you like to hit or stand?");
+                        hitter = hitorstand.nextLine();
+                    }
+
+
+                else if (quickReplyPayload.equals(FIFTY)) {
+                    int cash = 50;
                 } else {
                     sendGifMessage(senderId, "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif");
-                    sendTextMessage(senderId, "Go out and play then, you moron.");
+                    sendTextMessage(senderId, "Go outside then, you moron and talk to people.");
                 }
             } catch (MessengerApiException e) {
                 handleSendException(e);

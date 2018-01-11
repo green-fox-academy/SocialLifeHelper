@@ -71,8 +71,8 @@ public class Dealer {
     }
 
     // Prints the dealer's hand.
-    public void showHand() {
-        System.out.println(hand);
+    public String showHand() {
+        return String.valueOf(hand);
     }
 
     // Returns the value of the dealer's hand.
@@ -102,5 +102,13 @@ public class Dealer {
             System.out.print("The dealer stands.");
         }
         return handvalue;
+    }
+
+    @Override
+    public String toString() {
+        for (Card c: hand) {
+            c.toString();
+        }
+        return hand.toString();
     }
 }

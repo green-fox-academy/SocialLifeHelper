@@ -41,4 +41,6 @@ public class Card {
     public void setValue(int set) {
         value = set;
     }
+
+
 }
