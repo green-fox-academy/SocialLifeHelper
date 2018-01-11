@@ -72,15 +72,19 @@ public class CallBackHandler {
             logger.debug("Received TextMessageEvent: {}", event);
 
             final String messageId = event.getMid();
-            final String messageText = event.getText();
+            String messageText = event.getText();
             final String senderId = event.getSender().getId();
             final Date timestamp = event.getTimestamp();
 
             logger.info("Received message '{}' with text '{}' from user '{}' at '{}'",
                     messageId, messageText, senderId, timestamp);
 
+            String userSayHi = messageText;
+
             sendTextMessage(senderId, "Hi! What is your name?");
+
             String name = messageText;
+
             sendTextMessage(senderId, "Hello, "+ name +", lets play some BlackJack!");
 
         };
